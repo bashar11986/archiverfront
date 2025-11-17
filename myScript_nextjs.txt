@@ -1,0 +1,55 @@
+//for create new app in next js:
+npx create-next-app@latest myappname
+
+//run project
+npm run dev
+
+//run project in product
+npm run build
+//then
+npm run start
+
+//CSR: Client-Side Rendering
+//SSR: Server-Side Rendering
+// package for multi language
+npm install next-intl
+
+[locale]  // dynamic  folder
+تم كتابتها بالاقواس لاسم المجلد يعني المجلد ديناميكي قد يأخذ قيمة ar او en
+مجلد [locale] يسمح لك أن يكون لديك صفحات مثل:
+
+/ar/adminDashboard
+/en/adminDashboard
+
+
+وسيقوم Next.js تلقائيًا بتحميل ملف الترجمة الصحيح (ar.json أو en.json).
+
+
+
+
+// refresh next:
+
+# حذف مجلد .next
+Remove-Item -Recurse -Force .next
+
+# حذف مجلد node_modules
+Remove-Item -Recurse -Force node_modules
+
+# حذف ملف package-lock.json إن وجد
+Remove-Item -Force package-lock.json
+
+# إعادة تثبيت الحزم
+npm install
+
+# تشغيل المشروع
+npm run dev
+
+# docker:
+1- create two files in project root: Dockerfile, .dockerignore
+2- create image:    
+    in root project folder terminat >> docker build -t archiver-nextjs .
+3- run container:
+    in root project folder terminat >> docker run -d -p 3000:3000 archiver-nextjs
+
+# format code in vs code
+alt + shift + F

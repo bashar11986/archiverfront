@@ -1,0 +1,20 @@
+# 1️⃣ استخدم صورة Node رسمية
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN npm run build
+
+# 2️⃣ استخدم صورة تشغيل خفيفة
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+COPY --from=builder /app ./
+
+EXPOSE 3000
+CMD ["npm", "start"]
+

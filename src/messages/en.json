@@ -1,0 +1,62 @@
+{
+  "common": {
+    "hello": "Hello",
+    "welcome": "Welcome, {name}!",
+    "logout": "logout",
+    "myApp": "Archiver System"
+  },
+  "home": {
+    "title": "Home page"
+  },
+  "login": {
+    "title": "Login please",
+    "button": "login",
+    "logging": "logging in ...",
+    "logginFaild": "login Faild",
+    "placeholder": {
+      "username": "username",
+      "password": "password"
+    }
+  },
+  "dashboard": {
+    "title": "dashboard",
+    "userCount": "Total Users",
+    "table": {
+      "lable": "Users",
+      "columns": {
+        "Name": "Name",
+        "Email": "Email",
+        "phoneNumber": "phoneNumber",
+        "Roles": "Roles",
+        "Tools": "Tools"
+      },
+      "buttons": {
+        "Edit": "Edit",
+        "Delete": "Delete"
+      }
+    },
+    "buttons": {
+      "Refresh": "Refresh",
+      "Refreshing": "Refreshing ...",
+      "addUser": {
+        "title": "add User",
+        "modal": {
+          "title": "add new user",
+          "buttons":{
+            "save": "save",
+            "cancel":"cancel"
+          },
+          "placeholder":{
+            "username":"username",
+            "password":"password",
+            "email": "email",
+            "phoneNumber": "phone number"
+
+          }
+        }
+      },
+      "addRole": "add Role",
+      "assignRole": "assign Role"
+    }
+  }
+}

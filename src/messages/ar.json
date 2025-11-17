@@ -1,0 +1,65 @@
+{
+    "common": {
+      "hello": "مرحبا",
+      "welcome": "مرحباً، {name}!",
+      "logout": "تسجيل الخروج",
+      "myApp": "نظام إدارة الوثائق"
+    },
+    "home": {
+      "title": "الصفحة الرئيسية"
+    },
+    "login":{
+      "title": "يرجى تسجيل الدخول",
+      "button": "تسجيل الدخول",
+      "logging": "جار تسجيل الدخول ...",
+      "logginFaild": "فشل في تسجيل الدخول",
+      "placeholder":{
+        "username":"اسم المستخدم",
+        "password":"كلمة المرور"
+      }
+    },
+    "dashboard":{
+      "title":"لوحة التحكم",
+      "userCount":"عدد المستخدمين",
+      "table":{
+        "lable": "المستخدمون",
+        "columns": {
+          "Name": "الاسم",
+          "Email": "الايميل",
+          "phoneNumber": "رقم الهاتف",
+          "Roles": "الأدوار",
+          "Tools": "أدوات"
+        },
+        "buttons":{
+          "Edit": "تعديل",
+          "Delete": "حذف"        
+        }
+      },
+      "buttons":{
+        "Refresh" : "تحديث",
+        "Refreshing" : "جاري التحديث ...",
+        "addUser": {
+          "title": "إضافة مستخدم",
+          "modal": {
+            "title": "إضافة مستخدم جديد",
+            "buttons":{
+              "save": "حفظ",
+              "cancel":"إلغاء"
+            },
+            "placeholder":{
+              "username":"اسم المستخدم",
+              "password":"كلمة المرور",
+              "email": "البريد الالكتروني",
+              "phoneNumber": "رقم الهاتف"
+  
+            }
+          }
+        },
+        "addRole":"إضافة دور",
+        "assignRole":"إسناد دور لمستخدم"
+      }
+
+
+    }
+  }
+  
