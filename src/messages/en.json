@@ -3,7 +3,8 @@
     "hello": "Hello",
     "welcome": "Welcome, {name}!",
     "logout": "logout",
-    "myApp": "Archiver System"
+    "myApp": "Archiver System",
+    "Error" : "Error: "
   },
   "home": {
     "title": "Home page"

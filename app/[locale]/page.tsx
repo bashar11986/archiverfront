@@ -20,6 +20,7 @@ export default function LoginPage() {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const tr = useTranslations('login');
 
   const onSubmit = async (data: FormData) => {
@@ -41,7 +42,18 @@ export default function LoginPage() {
       <h2 className="text-2xl font-bold mb-4">{tr("title")}</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <input {...register('userName')} type="text" placeholder={tr("placeholder.username")} className="w-full p-2 border rounded" />
-        <input {...register('password')} type="password" placeholder={tr("placeholder.password")} className="w-full p-2 border rounded" />
+       <div className="relative"> 
+        <input {...register('password')}  type={showPassword ? "text" : "password"}  placeholder={tr("placeholder.password")} className="w-full p-2 border rounded" />
+        <span  className={`
+      absolute inset-y-0 flex items-center cursor-pointer 
+      ltr:right-3 rtl:left-3
+    `}          
+          onClick={() => setShowPassword(!showPassword)}
+        >
+          {/*  get emoji from keyboard => windows + .   or windows + ;*/}
+          {showPassword ? "😴" : "🫣"}  
+        </span>
+        </div>
         {error && <p className="text-red-500">{error}</p>}
         <button type="submit"
           disabled={isLoading}

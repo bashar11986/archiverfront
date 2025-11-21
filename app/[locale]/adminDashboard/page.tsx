@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { apiUsers, apiAccount } from "@/lib/api";
 import { RotateCcw, UserPlus, ShieldPlus, UserCog } from "lucide-react"; // أيقونة من مكتبة lucide-react (مدعومة في Next)
 import { useTranslations } from 'next-intl';
+import ModalAddUser from 'components/ModalAddUser';
 
 interface User {
   id: string;
@@ -26,39 +27,47 @@ export default function AdminDashboard() {
     email: "",
     phoneNumber: "",
   });
-  const handleSaveUser = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem("token");
-      const currentlang = localStorage.getItem("lang") || "en";
-      const response = await apiAccount.post('/NewUser',
-        {
-          username: userData.username,
-          password: userData.password,
-          email: userData.email,
-          phoneNumber: userData.phoneNumber
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-            "Accept-Language": currentlang
-          },
-        }
-      );
-      fetchUsers(); //refresh page get users
-      setUserData({ username: "", password: "", email: "", phoneNumber: "" });
-      setShowModal(false);
+  // const handleSaveUser = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     const currentlang = localStorage.getItem("lang") || "en";
+  //     const response = await apiAccount.post('/NewUser',
+  //       {
+  //         username: userData.username,
+  //         password: userData.password,
+  //         email: userData.email,
+  //         phoneNumber: userData.phoneNumber
+  //       },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //           "Content-Type": "application/json",
+  //           "Accept-Language": currentlang
+  //         },
+  //       }
+  //     );
+  //     console.log(response);
+  //     fetchUsers(); //refresh page get users
+  //     setUserData({ username: "", password: "", email: "", phoneNumber: "" });
+  //     setShowModal(false);
 
-    } catch (error) {
-      console.error("Error:", error);
-      alert("حدث خطأ أثناء إضافة المستخدم");
-    } finally {
-      setLoading(false);
-    }
-  };
+  //   } catch (error) {
+  //     const serverMessage =
+  //       error?.response?.data?.message ||
+  //       error?.response?.data ||
+  //       error?.message ||
+  //       "Unknown error occurred";
+       
+
+  //     alert(terr("Error") + JSON.stringify(serverMessage));
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const t = useTranslations('dashboard');
+  const terr = useTranslations('common');
   // get users when page load
   const fetchUsers = async function () {
     setRefreshing(true);
@@ -107,6 +116,15 @@ export default function AdminDashboard() {
             <UserPlus size={14} />
             {t("buttons.addUser.title")}
           </button>
+          <ModalAddUser
+            showModal={showModal}
+            setShowModal = {() => {setShowModal(false)            
+            }}
+            userData={userData}
+            setUserData={setUserData}       
+            refreshUser = {fetchUsers}            
+          />
+
 
           {/* زر إضافة دور */}
           <button
@@ -126,71 +144,6 @@ export default function AdminDashboard() {
             {t("buttons.assignRole")}
           </button>
         </div>
-
-        {showModal && (
-          <div className="fixed inset-0 flex justify-center items-center z-50">
-            <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative border">
-              <h2 className="text-xl font-semibold mb-4">{t("buttons.addUser.modal.title")}</h2>
-
-              <div className="space-y-3">
-                <input
-                  type="text"
-                  placeholder={t("buttons.addUser.modal.placeholder.username")}
-                  value={userData.username}
-                  onChange={(e) =>
-                    setUserData({ ...userData, username: e.target.value })
-                  }
-                  className="w-full border rounded p-2 text-sm"
-                />
-                <input
-                  type="password"
-                  placeholder={t("buttons.addUser.modal.placeholder.password")}
-                  value={userData.password}
-                  onChange={(e) =>
-                    setUserData({ ...userData, password: e.target.value })
-                  }
-                  className="w-full border rounded p-2 text-sm"
-                />
-                <input
-                  type="email"
-                  placeholder={t("buttons.addUser.modal.placeholder.email")}
-                  value={userData.email}
-                  onChange={(e) =>
-                    setUserData({ ...userData, email: e.target.value })
-                  }
-                  className="w-full border rounded p-2 text-sm"
-                />
-                <input
-                  type="text"
-                  placeholder={t("buttons.addUser.modal.placeholder.phoneNumber")}
-                  value={userData.phoneNumber}
-                  onChange={(e) =>
-                    setUserData({ ...userData, phoneNumber: e.target.value })
-                  }
-                  className="w-full border rounded p-2 text-sm"
-                />
-              </div>
-
-              {/* أزرار الحفظ والإلغاء */}
-              <div className="flex justify-end gap-2 mt-6">
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-sm rounded-md border hover:bg-gray-100 transition"
-                >
-                 {t("buttons.addUser.modal.buttons.cancel")}
-                </button>
-                <button
-                  onClick={handleSaveUser}
-                  disabled={loading}
-                  className={`px-4 py-2 text-sm rounded-md text-white bg-blue-600 hover:bg-blue-700 transition ${loading ? "opacity-60 cursor-not-allowed" : ""
-                    }`}
-                >
-                  {loading ? "جارٍ الحفظ..." : t("buttons.addUser.modal.buttons.save")}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
 
