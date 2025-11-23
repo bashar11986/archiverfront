@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { apiUsers, apiAccount } from "@/lib/api";
+import { apiUsers, apiRoles} from "@/lib/api";
 import { RotateCcw, UserPlus, ShieldPlus, UserCog } from "lucide-react"; // أيقونة من مكتبة lucide-react (مدعومة في Next)
 import { useTranslations } from 'next-intl';
 import ModalAddUser from 'components/ModalAddUser';
+import ModalAddRole from 'components/ModalAddRole';
+import ModalAssignRole from 'components/ModalAssignRole';
 
 interface User {
   id: string;
@@ -13,61 +15,33 @@ interface User {
   phoneNumber: string;
   roles: string[];
 }
+interface Role{
+  id: string;
+  name: string;
+}
 
 export default function AdminDashboard() {
-  //const t = useTranslations(); // الترجمة
   const [users, setUsers] = useState<User[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showModalRole, setShowModalRole] = useState(false);
+  const [showModalUserRole, setShowModalUserRole] = useState(false);
   const [userData, setUserData] = useState({
     username: "",
     password: "",
     email: "",
     phoneNumber: "",
   });
-  // const handleSaveUser = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     const currentlang = localStorage.getItem("lang") || "en";
-  //     const response = await apiAccount.post('/NewUser',
-  //       {
-  //         username: userData.username,
-  //         password: userData.password,
-  //         email: userData.email,
-  //         phoneNumber: userData.phoneNumber
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           "Content-Type": "application/json",
-  //           "Accept-Language": currentlang
-  //         },
-  //       }
-  //     );
-  //     console.log(response);
-  //     fetchUsers(); //refresh page get users
-  //     setUserData({ username: "", password: "", email: "", phoneNumber: "" });
-  //     setShowModal(false);
-
-  //   } catch (error) {
-  //     const serverMessage =
-  //       error?.response?.data?.message ||
-  //       error?.response?.data ||
-  //       error?.message ||
-  //       "Unknown error occurred";
-       
-
-  //     alert(terr("Error") + JSON.stringify(serverMessage));
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
+  const [roleData, setRoleData] = useState({
+    roleName: ""
+  })
+  const [collapsed, setCollapsed] = useState(false);
+  const [collapsedRole, setCollapsedRole] = useState(false);
   const t = useTranslations('dashboard');
-  const terr = useTranslations('common');
+  const tCommon = useTranslations('common');
   // get users when page load
   const fetchUsers = async function () {
     setRefreshing(true);
@@ -80,78 +54,59 @@ export default function AdminDashboard() {
       });
       setUsers(response.data);
     } catch (err) {
-      setError("فشل في جلب بيانات المستخدمين");
+      setError(t("errUserFetch"));
       console.log(err)
     } finally {
       setRefreshing(false);
       setLoading(false);
     }
   };
-
+  const fetchRoles = async function () {
+    setRefreshing(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await apiRoles.get("/GetAllRoles", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setRoles(response.data);
+      console.log("roles: ",roles)
+    } catch (err) {
+      setError(t("errRolesFetch"));
+      console.log(err)
+    } finally {
+      setRefreshing(false);
+      setLoading(false);
+    }
+  };
   useEffect(function () {
     fetchUsers();
+    fetchRoles();
   }, []);
-
+const refreshAll = async function () {
+  setRefreshing(true);
+  fetchUsers();
+  fetchRoles();
+}
   const handleDelete = (email: string) => {
     setUsers(users.filter((u) => u.email !== email));
   };
+  const handleDeleteRole = (name: string) => {
+    setRoles(roles.filter((u) => u.name !== name));
+  };
 
-  if (loading) return <p className="p-6">جاري التحميل...</p>;
+  if (loading) return <p className="p-6">{tCommon("loading")}</p>;
   if (error) return <p className="p-6 text-red-500">{error}</p>;
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="flex justify-between items-center mb-6">
-        {/* العنوان */}
+        {/* dashboard title */}
         <h1 className="text-3xl font-bold">{t("title")}</h1>
-
-        {/* الأزرار المصغرة */}
-        <div className="flex items-center gap-2">
-          {/* زر إضافة مستخدم */}
-          <button
-            onClick={() => setShowModal(true)}
-
-            className="flex items-center gap-1.5 bg-blue-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-blue-700 transition"
-          >
-            <UserPlus size={14} />
-            {t("buttons.addUser.title")}
-          </button>
-          <ModalAddUser
-            showModal={showModal}
-            setShowModal = {() => {setShowModal(false)            
-            }}
-            userData={userData}
-            setUserData={setUserData}       
-            refreshUser = {fetchUsers}            
-          />
-
-
-          {/* زر إضافة دور */}
-          <button
-            // onClick={handleAddRole}
-            className="flex items-center gap-1.5 bg-green-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-green-700 transition"
-          >
-            <ShieldPlus size={14} />
-            {t("buttons.addRole")}
-          </button>
-
-          {/* زر إسناد دور */}
-          <button
-            // onClick={() => setShowModal(true)}
-            className="flex items-center gap-1.5 bg-purple-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-purple-700 transition"
-          >
-            <UserCog size={14} />
-            {t("buttons.assignRole")}
-          </button>
-        </div>
-      </div>
-
-
-      <div className="bg-white shadow rounded-lg p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <h2 className="text-xl font-semibold">{t('table.lable')} {users.length}</h2>
-          <button
-            onClick={fetchUsers}
+        
+        <button
+            onClick={refreshAll}
             disabled={refreshing}
             className={`group flex items-center gap-1 bg-blue-600 text-white text-sm px-3 py-1.5 rounded-md hover:bg-blue-700 transition ${refreshing ? "opacity-60 cursor-not-allowed" : ""
               }`}
@@ -164,69 +119,230 @@ export default function AdminDashboard() {
             />
             {refreshing ? t('buttons.Refreshing') : t('buttons.Refresh')}
           </button>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full border border-gray-200">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="py-3 px-4 border-b text-right font-medium  text-blue-900 border-l-1 border-blue-600">
-                  {t('table.columns.Name')}
-                </th>
-                <th className="py-3 px-4 border-b text-right font-medium  text-blue-900 border-l-1 border-blue-600">
-                  {t('table.columns.Email')}
-                </th>
-                <th className="py-3 px-4 border-b text-right font-medium  text-blue-900 border-l-1 border-blue-600">
-                  {t('table.columns.phoneNumber')}
-                </th>
-                <th className="py-3 px-4 border-b text-right font-medium  text-blue-900 border-l-1 border-blue-600">
-                  {t('table.columns.Roles')}
-                </th>
-                <th className="py-3 px-4 border-b text-right font-medium text-blue-900  border-blue-600">
-                  {t('table.columns.Tools')}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="py-3 px-4 border-r text-right  border-blue-600">{user.userName}</td>
-                  <td className="py-3 px-4 border-r text-right   border-blue-600">{user.email}</td>
-                  <td className="py-3 px-4 border-r text-right   border-blue-600">{user.phoneNumber || "-"}</td>
-                  <td className="py-3 px-4 border-r text-right  border-blue-600">
-                    {user.roles && user.roles.length > 0 ? (
-                      <div className="flex flex-wrap gap-1 justify-end">
-                        {user.roles.map((role, idx) => (
-                          <span
-                            key={idx}
-                            className="bg-indigo-200 text-indigo-800 px-2 py-1 rounded text-xs"
-                          >
-                            {role}
-                          </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="text-gray-500 italic text-sm">بدون دور</span>
-                    )}
-                  </td>
-                  <td className="py-3 px-4 border-r text-right border-blue-600">
-                    <div className="flex justify-end gap-2">
-                      <button className="bg-indigo-200 text-indigo-800 px-3 py-1 rounded text-sm hover:bg-indigo-300">
-                        {t('table.buttons.Edit')}
-                      </button>
-                      <button
-                        onClick={() => handleDelete(user.email)}
-                        className="bg-rose-200 text-rose-800 px-3 py-1 rounded text-sm hover:bg-rose-300"
-                      >
-                        {t('table.buttons.Delete')}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+
+        <div className="flex items-center gap-2">
+          {/* Add user BTN */}
+          <button
+            onClick={() => setShowModal(true)}
+
+            className="flex items-center gap-1.5 bg-blue-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-blue-700 transition"
+          >
+            <UserPlus size={14} />
+            {t("buttons.addUser.title")}
+          </button>
+          <ModalAddUser
+            showModal={showModal}
+            setShowModal={() => {
+              setShowModal(false)
+            }}
+            userData={userData}
+            setUserData={setUserData}
+            refreshUser={fetchUsers}
+          />
+          <button
+            onClick={() => setShowModalRole(true)}
+            className="flex items-center gap-1.5 bg-green-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-green-700 transition"
+          >
+            <ShieldPlus size={14} />
+            {t("buttons.addRole.title")}
+          </button>
+          <ModalAddRole
+            showModalRole={showModalRole}
+            setShowModalRole={() => { setShowModalRole(false) }}
+            roleData={roleData}
+            setRoleData={setRoleData}
+            refreshUser
+          />
+          {/* assign Role BTN */}
+          <button
+            onClick={() => setShowModalUserRole(true)}
+            className="flex items-center gap-1.5 bg-purple-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-purple-700 transition"
+          >
+            <UserCog size={14} />
+            {t("buttons.assignRole.title")}
+          </button>
+          <ModalAssignRole
+            showModal={showModalUserRole}
+            setShowModal={() => setShowModalUserRole(false)}
+            refreshUserRoles={fetchUsers}
+          />
         </div>
       </div>
+
+
+      <div className="bg-white shadow rounded-lg p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <div
+            className="flex items-center gap-2 mb-4 cursor-pointer select-none"
+            onClick={() => setCollapsed(!collapsed)}
+          >
+            <h2 className="text-xl font-semibold">{t('table.lable')} {users.length}  </h2>
+
+            {/* The arrow icon - collapse or not */}
+            <svg
+              className={`w-5 h-5 transition-transform duration-300 ${collapsed ? "rotate-180" : "rotate-0"}`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+
+
+
+
+          {/* <button
+            onClick={fetchUsers}
+            disabled={refreshing}
+            className={`group flex items-center gap-1 bg-blue-600 text-white text-sm px-3 py-1.5 rounded-md hover:bg-blue-700 transition ${refreshing ? "opacity-60 cursor-not-allowed" : ""
+              }`}
+          >
+            <RotateCcw
+              size={14}
+              // className={refreshing ? "animate-spin" : ""}
+              className={`transition-transform duration-300 ${refreshing ? "animate-spin" : "group-hover:rotate-180"
+                }`}
+            />
+            {refreshing ? t('buttons.Refreshing') : t('buttons.Refresh')}
+          </button> */}
+        </div>
+
+        <div
+          className={`transition-all duration-500 overflow-hidden ${collapsed ? "max-h-0 opacity-0" : "max-h-[2000px] opacity-100"
+            }`}
+        >
+          <div className="overflow-x-auto">
+            <table className="min-w-full border border-gray-200">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="py-3 px-4 border-b text-right font-medium  text-blue-900 border-l-1 border-blue-600">
+                    {t('table.columns.Name')}
+                  </th>
+                  <th className="py-3 px-4 border-b text-right font-medium  text-blue-900 border-l-1 border-blue-600">
+                    {t('table.columns.Email')}
+                  </th>
+                  <th className="py-3 px-4 border-b text-right font-medium  text-blue-900 border-l-1 border-blue-600">
+                    {t('table.columns.phoneNumber')}
+                  </th>
+                  <th className="py-3 px-4 border-b text-right font-medium  text-blue-900 border-l-1 border-blue-600">
+                    {t('table.columns.Roles')}
+                  </th>
+                  <th className="py-3 px-4 border-b text-right font-medium text-blue-900  border-blue-600">
+                    {t('table.columns.Tools')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((user) => (
+                  <tr key={user.id} className="hover:bg-gray-50">
+                    <td className="py-3 px-4 border-r text-right  border-blue-600">{user.userName}</td>
+                    <td className="py-3 px-4 border-r text-right   border-blue-600">{user.email}</td>
+                    <td className="py-3 px-4 border-r text-right   border-blue-600">{user.phoneNumber || "-"}</td>
+                    <td className="py-3 px-4 border-r text-right  border-blue-600">
+                      {user.roles && user.roles.length > 0 ? (
+                        <div className="flex flex-wrap gap-1 justify-end">
+                          {user.roles.map((role, idx) => (
+                            <span
+                              key={idx}
+                              className="bg-indigo-200 text-indigo-800 px-2 py-1 rounded text-xs"
+                            >
+                              {role}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-gray-500 italic text-sm">بدون دور</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4 border-r text-right border-blue-600">
+                      <div className="flex justify-end gap-2">
+                        <button className="bg-indigo-200 text-indigo-800 px-3 py-1 rounded text-sm hover:bg-indigo-300">
+                          {t('table.buttons.Edit')}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(user.email)}
+                          className="bg-rose-200 text-rose-800 px-3 py-1 rounded text-sm hover:bg-rose-300"
+                        >
+                          {t('table.buttons.Delete')}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+
+ <div className="bg-white shadow rounded-lg p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <div
+            className="flex items-center gap-2 mb-4 cursor-pointer select-none"
+            onClick={() => setCollapsedRole(!collapsedRole)}
+          >
+            <h2 className="text-xl font-semibold">{t('roleTable.lable')} {roles.length}  </h2>
+
+            {/* The arrow icon - collapse or not */}
+            <svg
+              className={`w-5 h-5 transition-transform duration-300 ${collapsedRole ? "rotate-180" : "rotate-0"}`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>       
+        </div>
+
+        <div
+          className={`transition-all duration-500 overflow-hidden ${collapsedRole ? "max-h-0 opacity-0" : "max-h-[2000px] opacity-100"
+            }`}
+        >
+          <div className="overflow-x-auto">
+            <table className="min-w-full border border-gray-200">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="py-3 px-4 border-b text-right font-medium  text-blue-900 border-l-1 border-blue-600">
+                    {t('roleTable.columns.Name')}
+                  </th>
+                  
+                  <th className="py-3 px-4 border-b text-right font-medium text-blue-900  border-blue-600">
+                    {t('roleTable.columns.Tools')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {roles.map((role) => (
+                  <tr key={role.id} className="hover:bg-gray-50">
+                    <td className="py-3 px-4 border-r text-right  border-blue-600">{role.name}</td>
+                  
+                    <td className="py-3 px-4 border-r text-right border-blue-600">
+                      <div className="flex justify-end gap-2">
+                        <button className="bg-indigo-200 text-indigo-800 px-3 py-1 rounded text-sm hover:bg-indigo-300">
+                          {t('roleTable.buttons.Edit')}
+                        </button>
+                        <button
+                          onClick={() => handleDeleteRole(role.name)}
+                          className="bg-rose-200 text-rose-800 px-3 py-1 rounded text-sm hover:bg-rose-300"
+                        >
+                          {t('roleTable.buttons.Delete')}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+
 
     </div>
   );

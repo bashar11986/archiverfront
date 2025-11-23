@@ -1,92 +1,76 @@
 'use client';
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslations } from 'next-intl';
-import { apiUsers, apiAccount } from "@/lib/api";
+import { apiAccount } from "@/lib/api";
 
 
 export default function ModalAddUser({
-  showModal,  
+  showModal,
   setShowModal,
   userData,
-  setUserData  ,
+  setUserData,
   refreshUser
 }) {
-  //alert("start c")
-  const [showPassword, setShowPassword] = useState(false);
-  const [closeModal, setCloseModal] = useState(true);
-  const [closeModalDiv2, setCloseModaDiv2] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);  
   const [loading, setLoading] = useState(false);
-  //const [showModal, setShowModal] = useState(true);
   const t = useTranslations('dashboard');
   const terr = useTranslations('common');
 
 
   const formData = userData.username == "" || userData.password == ""
     || userData.email == "" || userData.phoneNumber == ""
-    const handleSaveUser = async () => {
-      setLoading(true);
-      try {
-        const token = localStorage.getItem("token");
-        const currentlang = localStorage.getItem("lang") || "en";
-        const response = await apiAccount.post('/NewUser',
-          {
-            username: userData.username,
-            password: userData.password,
-            email: userData.email,
-            phoneNumber: userData.phoneNumber
+  const handleSaveUser = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const currentlang = localStorage.getItem("lang") || "en";
+      const response = await apiAccount.post('/NewUser',
+        {
+          username: userData.username,
+          password: userData.password,
+          email: userData.email,
+          phoneNumber: userData.phoneNumber
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            "Accept-Language": currentlang
           },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-              "Accept-Language": currentlang
-            },
-          }
-        );
-        console.log(response);
-        refreshUser; //refresh page get users
-        setUserData({ username: "", password: "", email: "", phoneNumber: "" });
-        setShowModal(false);
-        setLoading(false);        
-      } catch (error) {
-        const serverMessage =
-          error?.response?.data?.message ||
-          error?.response?.data ||
-          error?.message ||
-          "Unknown error occurred";
-         
-  
-        alert(terr("Error") + JSON.stringify(serverMessage));
-      } finally {
-        setLoading(false);
-      }
-    };
-    function closeFun (){
-      setShowModal(false)
-    }
- 
-// function handleCloseModal(){  
-//   console.log("1: " + "closeModal: " + closeModal + " closeModalDiv2: " + closeModalDiv2)
-//   if((closeModal) && (closeModalDiv2)) {
-//     console.log(" onclose ")
-//     {onClose}
-//   }
-// }
-// function handleCloseModal2(){  
-//   console.log("2: " + "closeModal: " + closeModal + " closeModalDiv2: " + closeModalDiv2)
-//   setCloseModaDiv2(false)  
-  
-//  }
+        }
+      );
+      console.log(response);
+      refreshUser; //refresh page get users
+      setUserData({ username: "", password: "", email: "", phoneNumber: "" });
+      setShowModal(false);
+      setLoading(false);
+    } catch (error) {
+      const serverMessage =
+        error?.response?.data?.message ||
+        error?.response?.data ||
+        error?.message ||
+        "Unknown error occurred";
 
-  if (!showModal) return null;  
+
+      alert(terr("Error") + JSON.stringify(serverMessage));
+    } finally {
+      setLoading(false);
+    }
+  };
+  function closeFun() {
+    setShowModal(false)
+  }
+
+
+  if (!showModal) return null;
 
   return (
     /* bg-black/50 not bg-black opacity-50 .. i want opacity on external div , internal div without opacity*/
-    <div className="bg-black/50 fixed inset-0 flex justify-center items-center z-50 " 
-    //onClick={setShowModal(false)}  
-     hidden={showModal ? false : true}  
+    <div className="bg-black/50 fixed inset-0 flex justify-center items-center z-50 "
+      //onClick={setShowModal(false)}  
+      hidden={showModal ? false : true}
     >
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative border"   
+      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative border"
       // onClick={handleCloseModal2}         
       >
         <h2 className="text-xl font-semibold mb-4">

@@ -4,7 +4,15 @@
       "welcome": "مرحباً، {name}!",
       "logout": "تسجيل الخروج",
       "myApp": "نظام إدارة الوثائق",
-      "Error" : "خطأ: "
+      "Error" : "خطأ: ",
+      "Save" : "حفظ",
+      "Saving" : "جار الحفظ ...",
+      "cancel" : "إغلاق",
+      "selectUserRole" : "يرجى اختيار المستخدم والدور",
+      "select" : "اختر ...",
+      "noResults" : "لايوجد نتائج",
+      "searching" : "بحث ...",
+      "loading" : "جار التحميل ..."
     },
     "home": {
       "title": "الصفحة الرئيسية"
@@ -56,11 +64,50 @@
             }
           }
         },
-        "addRole":"إضافة دور",
-        "assignRole":"إسناد دور لمستخدم"
+        "addRole": {
+          "title": "إضافة دور",
+          "modal": {
+            "title": "إضافة دور جديد",
+            "buttons":{
+              "save": "حفظ",
+              "cancel":"إغلاق"
+            },
+            "placeholder":{
+              "rolename":"اسم الدور"
+            }
+          }
+        },
+        "assignRole": {
+        "title": "إسناد دور لمستخدم",
+        "modal": {
+          "title": "إسناد دور لمستخدم",
+          "lableSelectUser" : "اختر المستخدم",
+          "lableSelectRole" : "اختر الدور",
+          "buttons":{
+            "save": "حفظ",
+            "cancel":"إغلاق"
+          },
+          "placeholder":{
+            "username":"اسم المستخدم",
+            "rolename":"اسم الدور"
+          }
+        }
       }
-
-
+      },
+    "errUserFetch" : "فشل في جلب بيانات المستخدمين",
+    "errRolesFetch" : "فشل في جلب الأدوار",
+    "roleCount": "Total Roles",
+    "roleTable":{
+      "lable": "الأدوار",
+      "columns": {
+        "Name": "اسم الدور",       
+        "Tools": "أدوات"
+      },
+      "buttons": {
+        "Edit": "تعديل",
+        "Delete": "حذف"
+      }
+    }
     }
   }
   

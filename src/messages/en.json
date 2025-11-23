@@ -4,7 +4,15 @@
     "welcome": "Welcome, {name}!",
     "logout": "logout",
     "myApp": "Archiver System",
-    "Error" : "Error: "
+    "Error" : "Error: ",
+    "Save" : "ٍSave",
+    "Saving" : "Saving ...",
+    "cancel" : "Cancel",
+    "selectUserRole" : "please select user and role!",
+    "select" : "select ...",
+    "noResults" : "No Results",
+    "searching" : "Search ...",
+    "loading" : "loading ..."
   },
   "home": {
     "title": "Home page"
@@ -20,7 +28,7 @@
     }
   },
   "dashboard": {
-    "title": "dashboard",
+    "title": "Admin dashboard",
     "userCount": "Total Users",
     "table": {
       "lable": "Users",
@@ -56,8 +64,50 @@
           }
         }
       },
-      "addRole": "add Role",
-      "assignRole": "assign Role"
+      "addRole": {
+        "title": "add Role",
+        "modal": {
+          "title": "add new Role",
+          "buttons":{
+            "save": "save",
+            "cancel":"cancel"
+          },
+          "placeholder":{
+            "rolename":"role name"
+          }
+        }
+      },
+      "assignRole": {
+        "title": "assign Role",
+        "modal": {
+          "title": "assign Role To User",
+          "lableSelectUser" : "select User",
+          "lableSelectRole" : "select Role",
+          "buttons":{
+            "save": "save",
+            "cancel":"cancel"
+          },
+          "placeholder":{
+            "username":"user name",
+            "rolename":"role name"
+          }
+        }
+      }
+    },
+    "errUserFetch" : "fetch users faild",
+    "errRolesFetch" : "fetch roles faild",
+    "roleCount": "Total Roles",
+    "roleTable":{
+      "lable": "Roles",
+      "columns": {
+        "Name": "Name",       
+        "Tools": "Tools"
+      },
+      "buttons": {
+        "Edit": "Edit",
+        "Delete": "Delete"
+      }
     }
+
   }
 }
