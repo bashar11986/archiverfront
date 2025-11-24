@@ -19,11 +19,7 @@ export default function ModalAssignRole({
 
   const [selectedUser, setSelectedUser] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
-
-  // for search user and role
-  const [searchUser, setSearchUser] = useState("");
-  const [searchRole, setSearchRole] = useState("");
-
+  
   // get users
   const fetchUsers = async () => {
     try {
@@ -132,32 +128,7 @@ export default function ModalAssignRole({
 
         {/* اختيار المستخدم */}
         <div className="mb-3">
-          {/* <label className="text-sm font-medium">اختر المستخدم</label>
-          <input
-            type="text"
-            placeholder="بحث..."
-            value={searchUser}
-            onChange={(e) => setSearchUser(e.target.value)}
-            className="w-full border rounded p-2 text-sm mt-1"
-          />
-
-          <select
-            className="w-full border rounded p-2 text-sm mt-2"
-            value={selectedUser}
-            onChange={(e) => setSelectedUser(e.target.value)}
-          >
-            <option value="">-- اختر مستخدم --</option>
-            {usersr
-              .filter(u =>
-                u.userName.toLowerCase().includes(searchUser.toLowerCase())
-              )
-              .map((u) => (
-                <option key={u.id} value={u.userName}>
-                  {u.userName}
-                </option>
-              ))
-              }
-          </select> */}
+          
           <SearchableSelect
   label= {t("buttons.assignRole.modal.lableSelectUser")}
   options={usersr}
@@ -170,32 +141,7 @@ export default function ModalAssignRole({
 
         {/* اختيار الدور */}
         <div className="mb-3">
-          {/* <label className="text-sm font-medium">اختر الدور</label>
-          <input
-            type="text"
-            placeholder="بحث..."
-            value={searchRole}
-            onChange={(e) => setSearchRole(e.target.value)}
-            className="w-full border rounded p-2 text-sm mt-1"
-          />
-
-          <select
-            className="w-full border rounded p-2 text-sm mt-2"
-            value={selectedRole}
-            onChange={(e) => setSelectedRole(e.target.value)}
-          >
-            <option value="">-- اختر دور --</option>
-            {roles
-              .filter(r =>
-                r.name.toLowerCase().includes(searchRole.toLowerCase())
-              )
-              .map((r) => (
-                <option key={r.id} value={r.name}>
-                  {r.name}
-                </option>
-              ))}
-          </select> */}
-
+          
 <SearchableSelect
   label= {t("buttons.assignRole.modal.lableSelectRole")}
   options={roles}

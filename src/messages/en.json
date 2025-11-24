@@ -12,7 +12,11 @@
     "select" : "select ...",
     "noResults" : "No Results",
     "searching" : "Search ...",
-    "loading" : "loading ..."
+    "loading" : "loading ...",
+    "Password" : "password",
+    "newPassword" : "new password",
+    "email" : "email",
+    "newEmail" : "new email"
   },
   "home": {
     "title": "Home page"

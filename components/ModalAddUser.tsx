@@ -1,144 +1,211 @@
 'use client';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from 'next-intl';
-import { apiAccount } from "@/lib/api";
-
+import { apiUsers, apiAccount } from "@/lib/api";
+import toast from "react-hot-toast";
 
 export default function ModalAddUser({
-  showModal,
-  setShowModal,
-  userData,
-  setUserData,
-  refreshUser
+    showModal,
+    setShowModal,
+    userData,
+    setUserData,
+    userDataEdit,
+    setUserDataEdit,
+    refreshUser,
+    isEditMode = false,     // ← إضافة الوضع الجديد
+    editingUser = null      // ← بيانات المستخدم القديم
 }) {
-  const [showPassword, setShowPassword] = useState(false);  
-  const [loading, setLoading] = useState(false);
-  const t = useTranslations('dashboard');
-  const terr = useTranslations('common');
 
+    const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const t = useTranslations('dashboard');
+    const tCommon = useTranslations('common');
 
-  const formData = userData.username == "" || userData.password == ""
-    || userData.email == "" || userData.phoneNumber == ""
-  const handleSaveUser = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem("token");
-      const currentlang = localStorage.getItem("lang") || "en";
-      const response = await apiAccount.post('/NewUser',
-        {
-          username: userData.username,
-          password: userData.password,
-          email: userData.email,
-          phoneNumber: userData.phoneNumber
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-            "Accept-Language": currentlang
-          },
+    // تعبئة البيانات عند التعديل
+    useEffect(() => {
+        if (isEditMode && editingUser) {
+            setUserDataEdit({
+                username: editingUser.userName,
+                newUserName: "",
+                email: editingUser.email,
+                phoneNumber: editingUser.phoneNumber || "",
+                newPassword: ""             // كلمة مرور جديدة إذا أراد
+            });
         }
-      );
-      console.log(response);
-      refreshUser; //refresh page get users
-      setUserData({ username: "", password: "", email: "", phoneNumber: "" });
-      setShowModal(false);
-      setLoading(false);
-    } catch (error) {
-      const serverMessage =
-        error?.response?.data?.message ||
-        error?.response?.data ||
-        error?.message ||
-        "Unknown error occurred";
+    }, [isEditMode, editingUser]);
 
 
-      alert(terr("Error") + JSON.stringify(serverMessage));
-    } finally {
-      setLoading(false);
-    }
-  };
-  function closeFun() {
-    setShowModal(false)
-  }
+    // Validation
+    const validateForm = () => {
+        if (!userData.username.trim()) return "اسم المستخدم مطلوب";
+        if (!userData.email.trim()) return "البريد الإلكتروني مطلوب";
+
+        if (!isEditMode && !userData.password.trim())
+            return "كلمة المرور مطلوبة عند الإضافة";
+
+        if (userData.phoneNumber.trim().length < 9)
+            return "رقم الهاتف غير صالح";
+
+        return null;
+    };
+
+    const handleSaveUser = async () => {
+        alert("add edit user ..")
+        alert("isEditMode .. " + isEditMode)
+        // const validationError = validateForm();
+        // if (validationError) {
+        //     alert("validationError")
+        //     toast.error(validationError);
+        //     return;
+        // }
+        alert("2")
+        setLoading(true);
+
+        try {
+            const token = localStorage.getItem("token");
+            const lang = localStorage.getItem("lang") || "en";
+
+            if (isEditMode) {
+                // 🟦 تعديل مستخدم
+                await apiUsers.put(
+                    "/EditUser",
+                    {
+                        userName: editingUser.userName,      // القديم
+                        newUserName: userData.username,      // الجديد
+                        email: userData.email,
+                        phoneNumber: userData.phoneNumber,
+                        newPassword: userData.password || ""
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Accept-Language": lang
+                        }
+                    }
+                );
+
+                toast.success("تم تعديل المستخدم بنجاح");
+
+            } else {
+                // 🟩 إضافة مستخدم
+                await apiAccount.post(
+                    "/NewUser",
+                    {
+                        username: userData.username,
+                        password: userData.password,
+                        email: userData.email,
+                        phoneNumber: userData.phoneNumber
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                            "Accept-Language": lang
+                        }
+                    }
+                );
+
+                toast.success("تم إضافة المستخدم بنجاح");
+            }
+
+            // تحديث القائمة + إغلاق المودال
+            refreshUser();
+            setUserData({ username: "", password: "", email: "", phoneNumber: "" });
+            setShowModal(false);
+
+        } catch (error) {
+            const msg =
+                error?.response?.data?.message ||
+                error?.response?.data ||
+                error?.message ||
+                "حدث خطأ غير معروف";
+
+            toast.error(msg);
+
+        } finally {
+            setLoading(false);
+        }
+    };
 
 
-  if (!showModal) return null;
+    if (!showModal) return null;
 
-  return (
-    /* bg-black/50 not bg-black opacity-50 .. i want opacity on external div , internal div without opacity*/
-    <div className="bg-black/50 fixed inset-0 flex justify-center items-center z-50 "
-      //onClick={setShowModal(false)}  
-      hidden={showModal ? false : true}
-    >
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative border"
-      // onClick={handleCloseModal2}         
-      >
-        <h2 className="text-xl font-semibold mb-4">
-          {t("buttons.addUser.modal.title")}
-        </h2>
+    return (
+        <div className="bg-black/50 fixed inset-0 flex justify-center items-center z-50">
+            <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative border">
 
-        <div className="space-y-3">
-          <input
-            type="text"
-            placeholder={t("buttons.addUser.modal.placeholder.username")}
-            value={userData.username}
-            onChange={(e) => setUserData({ ...userData, username: e.target.value })}
-            className="w-full border rounded p-2 text-sm"
-          />
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder={t("buttons.addUser.modal.placeholder.password")}
-              value={userData.password}
-              onChange={(e) => setUserData({ ...userData, password: e.target.value })}
-              className="w-full border rounded p-2 text-sm"
-            />
-            <span className={`
-      absolute inset-y-0 flex items-center cursor-pointer 
-      ltr:right-3 rtl:left-3
-    `}
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {/*  get emoji from keyboard => windows + .   or windows + ;*/}
-              {showPassword ? "😴" : "🫣"}
-            </span>
-          </div>
-          <input
-            type="email"
-            placeholder={t("buttons.addUser.modal.placeholder.email")}
-            value={userData.email}
-            onChange={(e) => setUserData({ ...userData, email: e.target.value })}
-            className="w-full border rounded p-2 text-sm"
-          />
+                <h2 className="text-xl font-semibold mb-4">
+                    {isEditMode ? "تعديل مستخدم" : t("buttons.addUser.modal.title")}
+                </h2>
 
-          <input
-            type="text"
-            placeholder={t("buttons.addUser.modal.placeholder.phoneNumber")}
-            value={userData.phoneNumber}
-            // ...userData : three point means copy userData
-            onChange={(e) => setUserData({ ...userData, phoneNumber: e.target.value })}
-            className="w-full border rounded p-2 text-sm"
-          />
+                <div className="space-y-3">
+                    <input
+                        type="text"
+                        placeholder="اسم المستخدم"
+                        value={isEditMode ? userDataEdit.newUserName : userData.username}
+                        onChange={isEditMode ? (e) => setUserDataEdit({ ...userDataEdit, newUserName: e.target.value })
+                            :
+                            (e) => setUserData({ ...userData, username: e.target.value })
+                        }
+                        className="w-full border rounded p-2 text-sm"
+                    />
+
+                    {/* كلمة المرور - اختيارية عند التعديل */}
+                    <div className="relative">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            placeholder={isEditMode ? tCommon("newPassword") : tCommon("Password")}
+                            value={isEditMode ? userDataEdit.newPassword : userData.password}
+                            onChange={isEditMode ? (e) => setUserDataEdit({ ...userDataEdit, newPassword: e.target.value })
+                                :
+                                (e) => setUserData({ ...userData, password: e.target.value })}
+                            className="w-full border rounded p-2 text-sm"
+                        />
+                        <span
+                            className="absolute inset-y-0 flex items-center cursor-pointer ltr:right-3 rtl:left-3"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? "😴" : "🫣"}
+                        </span>
+                    </div>
+
+                    <input
+                        type="email"
+                        placeholder={isEditMode ? tCommon("newEmail") : tCommon("email")}
+                        value={isEditMode ? userDataEdit.email : userData.email}
+                        onChange={isEditMode ? (e) => setUserDataEdit({ ...userDataEdit, email: e.target.value })
+                            : (e) => setUserData({ ...userData, email: e.target.value })}
+                        className="w-full border rounded p-2 text-sm"
+                    />
+
+                    <input
+                        type="text"
+                        placeholder="رقم الجوال"
+                        value={userData.phoneNumber}
+                        onChange={(e) => setUserData({ ...userData, phoneNumber: e.target.value })}
+                        className="w-full border rounded p-2 text-sm"
+                    />
+                </div>
+
+                <div className="flex justify-end gap-2 mt-6">
+                    <button
+                        onClick={() => setShowModal(false)}
+                        className="px-4 py-2 text-sm rounded-md border hover:bg-gray-100 transition"
+                    >
+                        إلغاء
+                    </button>
+
+                    <button
+                        onClick={handleSaveUser}
+                        disabled={loading}
+                        className={`px-4 py-2 text-sm rounded-md text-white 
+            ${loading ? "bg-blue-300 opacity-60" : "bg-blue-600 hover:bg-blue-700"} `}
+                    >
+                        {loading ? "جارٍ الحفظ..." : (isEditMode ? "حفظ التعديلات" : "حفظ")}
+                    </button>
+                </div>
+
+            </div>
         </div>
-
-        <div className="flex justify-end gap-2 mt-6">
-          <button
-            onClick={closeFun}
-            className="px-4 py-2 text-sm rounded-md border hover:bg-gray-100 transition"
-          >
-            {t("buttons.addUser.modal.buttons.cancel")}
-          </button>
-
-          <button
-            onClick={handleSaveUser}
-            disabled={loading || formData}
-            className={`px-4 py-2 text-sm rounded-md text-white ${formData ? "bg-blue-300" : "bg-blue-600 hover:bg-blue-700 transition"}  ${loading ? "opacity-60 cursor-not-allowed" : ""
-              } `}
-          >
-            {loading ? "جارٍ الحفظ..." : t("buttons.addUser.modal.buttons.save")}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}    
+    );
+}

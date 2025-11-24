@@ -7,6 +7,10 @@ import { notFound } from 'next/navigation'
 import { routing } from '@/i18n/navigation' 
 import LocaleSwitcher from 'components/LocaleSwitcher'
 import LogoutButton from 'components/LogoutButton'
+// import { Toaster } from "react-hot-toast";
+
+// <Toaster position="top-center" reverseOrder={false} />
+
 
 const inter = Inter({ subsets: ['latin'] })
 

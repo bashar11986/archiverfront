@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import { apiUsers, apiRoles} from "@/lib/api";
 import { RotateCcw, UserPlus, ShieldPlus, UserCog } from "lucide-react"; // أيقونة من مكتبة lucide-react (مدعومة في Next)
 import { useTranslations } from 'next-intl';
@@ -35,11 +35,20 @@ export default function AdminDashboard() {
     email: "",
     phoneNumber: "",
   });
+  const [userDataEdit, setUserDataEdit] = useState({
+    username: "",
+    newUserName: "",
+    email: "",
+    phoneNumber: "",
+    newPassword: ""  
+  });
   const [roleData, setRoleData] = useState({
     roleName: ""
   })
   const [collapsed, setCollapsed] = useState(false);
   const [collapsedRole, setCollapsedRole] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+const [isEditMode, setIsEditMode] = useState(false);
   const t = useTranslations('dashboard');
   const tCommon = useTranslations('common');
   // get users when page load
@@ -138,6 +147,8 @@ const refreshAll = async function () {
             userData={userData}
             setUserData={setUserData}
             refreshUser={fetchUsers}
+            userDataEdit = {userDataEdit}
+            setUserDataEdit = {setUserDataEdit}
           />
           <button
             onClick={() => setShowModalRole(true)}
@@ -258,7 +269,20 @@ const refreshAll = async function () {
                     </td>
                     <td className="py-3 px-4 border-r text-right border-blue-600">
                       <div className="flex justify-end gap-2">
-                        <button className="bg-indigo-200 text-indigo-800 px-3 py-1 rounded text-sm hover:bg-indigo-300">
+                        <button 
+                         onClick={() => {
+                          setIsEditMode(true);
+                          setEditingUser(user);                          
+                          setUserDataEdit({
+                            username: user.userName,
+                            newUserName:"",
+                            email: user.email,
+                            phoneNumber: user.phoneNumber || "",
+                            newPassword: ""  
+                          });
+                          setShowModal(true);
+                        }}
+                        className="bg-indigo-200 text-indigo-800 px-3 py-1 rounded text-sm hover:bg-indigo-300">
                           {t('table.buttons.Edit')}
                         </button>
                         <button

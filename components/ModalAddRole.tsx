@@ -13,7 +13,7 @@ export default function ModalAddRole(
 ) {
     const [loading, setLoading] = useState(false);
     const t = useTranslations('dashboard');
-    const terr = useTranslations('common');
+    const tCommon = useTranslations('common');
     function closeFun() {
         setShowModalRole(false)
       }
@@ -31,7 +31,7 @@ export default function ModalAddRole(
               },
             }
           );
-          console.log(response);
+         console.log(response);
           refreshUser; //refresh page get users
           setShowModalRole(false);
           setLoading(false);
@@ -41,7 +41,7 @@ export default function ModalAddRole(
             error?.response?.data ||
             error?.message ||
             "Unknown error occurred";        
-          alert(terr("Error") + JSON.stringify(serverMessage));
+          alert(tCommon("Error") + JSON.stringify(serverMessage));
         } finally {
           setLoading(false);
         }
@@ -82,7 +82,7 @@ export default function ModalAddRole(
             className={`px-4 py-2 text-sm rounded-md text-white ${!roleData.roleName ? "bg-blue-300" : "bg-blue-600 hover:bg-blue-700 transition"}  ${loading ? "opacity-60 cursor-not-allowed" : ""
               } `}
           >
-            {loading ? "جارٍ الحفظ..." : t("buttons.addRole.modal.buttons.save")}
+            {loading ? tCommon("Saving") : tCommon("Save")}
           </button>
         </div>
         </div>
