@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { apiUsers, apiRoles, apiUserRoles } from "@/lib/api";
 import { useTranslations } from "next-intl";
-import SearchableSelect from 'components/SearchableSelect'
+import SearchableSelect from '@/widgets/SearchableSelect'
 
 export default function ModalAssignRole({
   showModal,

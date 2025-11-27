@@ -12,7 +12,7 @@ export default function ModalAddUser({
     userDataEdit,
     setUserDataEdit,
     refreshUser,
-    isEditMode = false,     // ← إضافة الوضع الجديد
+    isEditMode,   
     editingUser = null      // ← بيانات المستخدم القديم
 }) {
 
@@ -20,9 +20,10 @@ export default function ModalAddUser({
     const [loading, setLoading] = useState(false);
     const t = useTranslations('dashboard');
     const tCommon = useTranslations('common');
-
-    // تعبئة البيانات عند التعديل
+    
     useEffect(() => {
+        //alert("isEditMode: " + isEditMode)
+        console.log("userDataEdit: " , userDataEdit)
         if (isEditMode && editingUser) {
             setUserDataEdit({
                 username: editingUser.userName,
@@ -35,39 +36,36 @@ export default function ModalAddUser({
     }, [isEditMode, editingUser]);
 
 
-    // Validation
-    const validateForm = () => {
-        if (!userData.username.trim()) return "اسم المستخدم مطلوب";
-        if (!userData.email.trim()) return "البريد الإلكتروني مطلوب";
+    //// Validation
+    // const validateForm = () => {
+    //     if (!userData.username.trim()) return "اسم المستخدم مطلوب";
+    //     if (!userData.email.trim()) return "البريد الإلكتروني مطلوب";
 
-        if (!isEditMode && !userData.password.trim())
-            return "كلمة المرور مطلوبة عند الإضافة";
+    //     if (!isEditMode && !userData.password.trim())
+    //         return "كلمة المرور مطلوبة عند الإضافة";
 
-        if (userData.phoneNumber.trim().length < 9)
-            return "رقم الهاتف غير صالح";
+    //     if (userData.phoneNumber.trim().length < 9)
+    //         return "رقم الهاتف غير صالح";
 
-        return null;
-    };
+    //     return null;
+    // };
 
     const handleSaveUser = async () => {
-        alert("add edit user ..")
-        alert("isEditMode .. " + isEditMode)
+        //alert("isEditMode .. " + isEditMode)
         // const validationError = validateForm();
         // if (validationError) {
         //     alert("validationError")
         //     toast.error(validationError);
         //     return;
         // }
-        alert("2")
         setLoading(true);
-
         try {
-            const token = localStorage.getItem("token");
-            const lang = localStorage.getItem("lang") || "en";
+            // const token = localStorage.getItem("token");
+             const lang = localStorage.getItem("lang") || "en";
 
             if (isEditMode) {
-                // 🟦 تعديل مستخدم
-                await apiUsers.put(
+              //  alert("in if iseditmode: " + isEditMode)
+                const response = await apiUsers.put(
                     "/EditUser",
                     {
                         userName: editingUser.userName,      // القديم
@@ -78,13 +76,13 @@ export default function ModalAddUser({
                     },
                     {
                         headers: {
-                            Authorization: `Bearer ${token}`,
+                           // Authorization: `Bearer ${token}`,
                             "Accept-Language": lang
                         }
                     }
                 );
-
-                toast.success("تم تعديل المستخدم بنجاح");
+console.log("response in edit: " ,response)
+                // toast.success("تم تعديل المستخدم بنجاح");
 
             } else {
                 // 🟩 إضافة مستخدم
@@ -98,17 +96,16 @@ export default function ModalAddUser({
                     },
                     {
                         headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application/json",
+                            // Authorization: `Bearer ${token}`,
+                            // "Content-Type": "application/json",
                             "Accept-Language": lang
                         }
                     }
                 );
 
-                toast.success("تم إضافة المستخدم بنجاح");
+                // toast.success("تم إضافة المستخدم بنجاح");
             }
 
-            // تحديث القائمة + إغلاق المودال
             refreshUser();
             setUserData({ username: "", password: "", email: "", phoneNumber: "" });
             setShowModal(false);
@@ -120,7 +117,7 @@ export default function ModalAddUser({
                 error?.message ||
                 "حدث خطأ غير معروف";
 
-            toast.error(msg);
+            // toast.error(msg);
 
         } finally {
             setLoading(false);
@@ -142,7 +139,7 @@ export default function ModalAddUser({
                     <input
                         type="text"
                         placeholder="اسم المستخدم"
-                        value={isEditMode ? userDataEdit.newUserName : userData.username}
+                        value={isEditMode ? userDataEdit.username : userData.username}
                         onChange={isEditMode ? (e) => setUserDataEdit({ ...userDataEdit, newUserName: e.target.value })
                             :
                             (e) => setUserData({ ...userData, username: e.target.value })
@@ -155,7 +152,7 @@ export default function ModalAddUser({
                         <input
                             type={showPassword ? "text" : "password"}
                             placeholder={isEditMode ? tCommon("newPassword") : tCommon("Password")}
-                            value={isEditMode ? userDataEdit.newPassword : userData.password}
+                            value={userDataEdit.newPassword}
                             onChange={isEditMode ? (e) => setUserDataEdit({ ...userDataEdit, newPassword: e.target.value })
                                 :
                                 (e) => setUserData({ ...userData, password: e.target.value })}
@@ -172,7 +169,7 @@ export default function ModalAddUser({
                     <input
                         type="email"
                         placeholder={isEditMode ? tCommon("newEmail") : tCommon("email")}
-                        value={isEditMode ? userDataEdit.email : userData.email}
+                        value={userDataEdit.email}
                         onChange={isEditMode ? (e) => setUserDataEdit({ ...userDataEdit, email: e.target.value })
                             : (e) => setUserData({ ...userData, email: e.target.value })}
                         className="w-full border rounded p-2 text-sm"
@@ -181,8 +178,9 @@ export default function ModalAddUser({
                     <input
                         type="text"
                         placeholder="رقم الجوال"
-                        value={userData.phoneNumber}
-                        onChange={(e) => setUserData({ ...userData, phoneNumber: e.target.value })}
+                        value={userDataEdit.phoneNumber}
+                        onChange={isEditMode? (e) => setUserDataEdit({ ...userDataEdit, phoneNumber: e.target.value })
+                            :(e) => setUserData({ ...userData, phoneNumber: e.target.value })}
                         className="w-full border rounded p-2 text-sm"
                     />
                 </div>

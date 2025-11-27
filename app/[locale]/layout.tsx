@@ -5,8 +5,8 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { routing } from '@/i18n/navigation' 
-import LocaleSwitcher from 'components/LocaleSwitcher'
-import LogoutButton from 'components/LogoutButton'
+import {LocaleSwitcher} from '@/shared/ui/LocaleSwitcher/index'
+import {LogoutButton} from '@/shared/ui/LogoutButton/index'
 // import { Toaster } from "react-hot-toast";
 
 // <Toaster position="top-center" reverseOrder={false} />

@@ -19,7 +19,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // your config
+  // other config
 };
 
 module.exports = withNextIntl(nextConfig);
